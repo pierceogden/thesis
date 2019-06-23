@@ -17,7 +17,7 @@ In this work, we explore the potential and challenges of closing the loop betwee
 
 \begin{figure}[t!]
   \includegraphics[width=1\linewidth,page=2,trim={2cm 7cm 2cm 0}]{figures/2018-05-09-NIPS_2018_Figures.pdf}
-  \caption{\small{
+  \caption[Workflow for ML-guided protein design.]{\small{
     Workflow for ML-guided protein design. a) Simulated annealing of a model approximated fitness landscape proposes candidate sequences for exploration beyond the reach of directed evolution. b) The true landscape is iteratively revealed through synthesis and testing of proposed sequences. Model-guided designs can either be false discoveries, optimal, or near-misses (functional but not optimal). Directed evolution reveals the local neighborhood of model-guided designs and optimizes near misses.}
   }
   \label{workflow}
@@ -46,7 +46,7 @@ To explore a protein’s fitness landscape, we can leverage various molecular bi
 
 \begin{figure}[t]
   \includegraphics[width=1\linewidth,page=1,trim={2cm 9cm 2cm 0}]{figures/2018-05-09-NIPS_2018_Figures.pdf}
-  \caption{\small{
+  \caption[Structure of GFP]{\small{
     Structure of GFP. Left) side and top views of the GFP backbone illustrated as a ``ribbon.'' Right) Top views of GFP illustrating the orientation and interaction of amino acids inside and outside of the barrel. The electron density map better illustrates the natural occupancy of the amino acids.}
   }
   \label{gfp-struct}
@@ -122,7 +122,7 @@ We performed five training replicates of each model by using a different random 
 
 \begin{figure}
   \includegraphics[width=1\linewidth,page=3,trim={1cm 0.5cm 1cm 0}]{figures/2018-05-09-NIPS_2018_Figures.pdf}
-  \caption{\small{
+  \caption[Variations of train-dev-test split design guide model selection.]{\small{
     Variations of train-dev-test split design guide model selection. (Top) The three experimentally-generated datasets are visualized using the first two principal components of a PCA (see also Supp. Figure \ref{supp-pca}). Top panels indicate distribution of train (blue), dev (pink), test (green) data points. Black points are all remaining, unused points. (Bottom) Four train-dev-test splits were chosen for comparing six model architectures across two performance criteria, MSE and FDR.  Box plots indicate quartile boundaries of replicate performance. Triangle and square points indicate the min- and mean-ensembled performance of the replicates, respectively.}
     }
     \label{fig-tts}
@@ -152,7 +152,7 @@ We used these non-triviality scores to bias simulated annealing sampling of the 
 \begin{figure}
   \includegraphics[width=1\linewidth,page=4,trim={0cm 5cm 0cm 0}]{figures/2018-05-09-NIPS_2018_Figures.pdf}
  %\small{
-  \caption{\small{Locally trained Composite Residues model can generalize to non-local parts of the landscape.
+  \caption[Locally trained Composite Residues model can generalize to non-local parts of the landscape]{\small{Locally trained Composite Residues model can generalize to non-local parts of the landscape.
     (a) Normalized brightness (log-scale) vs number of mutations for experimentally generated random mutants (black), non-trivial mutants designed by CR-sigmoid (orange), and unrestricted mutants (green). Green circles indicate parents of initial 96 Designed Neighborhoods. Green squares correspond to unrestricted mutants designed using the Composite Residues model starting from the bright 96 Designed Neighborhoods parents. (b)  Inner-barrel facing mutations are enriched in functional non-trivial mutants relative unrestricted mutants.  Gray dashed line shows the expected number of inner-barrel mutations assuming random mutagenesis. (c) Atomic space-filled structure of GFP with core exposed and amino acids colored according to positional entropy ratios. Right plot shows the distribution of positional entropy ratios (functional-to-nonfunctional) for all amino acids (grey line), inner-barrel facing (orange), and outer barrel facing (green). Red vertical line depicts a hard threshold for defining non-triviality.}}
   %}
   \label{fig-generalization}
@@ -180,7 +180,7 @@ We conclude that though non-trivial mutations tend to have a negative phenotypic
 
 \begin{figure}
   \includegraphics[width=1\linewidth,page=5,trim={0cm 9cm 0cm 0}]{figures/2018-05-09-NIPS_2018_Figures.pdf}
-  \caption{\small{
+  \caption[Non-trivial mutations exhibit higher variance effect on function]{\small{
     Non-trivial mutations exhibit higher variance effect on function. (a) Predicted background-averaged impact on brightness for all mutations in all brighter-than-sfGFP mutants. (b) Example of non-additive effect of two mutations learned by the model and visualized on GFP structure.}
   }
   \label{non-trivial-variance}
@@ -197,6 +197,142 @@ Given model-guided exploration of the fitness landscape may be a valuable goal, 
 Of course, the discussion so far assumes there is a model in hand with which to assess generalization. A key contribution of this work is to highlight the difficulty of selecting a strongly generalizing model in the protein engineering domain. We found that model selection depended heavily on train-dev-test split design.  Interestingly, the model with the fewest number of parameters, Composite Residues, was the one that generalized the best in our evaluations. This, in part, is a consequence of the relatively simple out-of-sample hypotheses the model can make. However, we also argue that the superior performance of composite residues is attributable to its architecture, which succinctly captured realistic modularity in how groups of amino acids might biophysically cooperate to impact protein function.
 
 While we have developed our proof-of-concept using GFP, we expect that the methods, design principles, and lessons learned extend broadly to other proteins. All proteins fold according to the same thermodynamic laws, and have variably mutable amino acids that offer differing amounts of leverage over the protein. From a machine learning perspective, this makes protein engineering an exciting domain for developing new methods as the effect of mutational combinations range from purely additive to highly non-linear. Importantly, unlike many other design domains (e.g., chemical design \citep{gomez2016design}), synthesizing protein designs is largely a digital exercise (i.e. ordering sequences of DNA), and testing them experimentally can often be done massively in parallel.
+
+\vspace{-5mm}
+
+\section{Visualizing dataset characteristics}
+\begin{figure}[h]
+  \includegraphics[width=1\linewidth,page=10,trim={0cm 4.5cm 0cm 0}]{figures/2018-05-09-NIPS_2018_Figures.pdf}
+  \caption[Principal components analysis of initial training datasets]{Principal components analysis of initial training datasets, which includes the Sarkisyan, Break-Fix, and 96 Designed Neighborhoods datasets. Each point represents an individual GFP variant. Input features were mutability weighted one-hot encoded amino acid sequences. avGFP and sfGFP references are marked. a) Variants colored by number of mutations relative to sfGFP. b) Variants colored by normalized brightness, where sfGFP has brightness 0.95. Variants colored by their source datasets are depicted in Figure 3 of the main text.} \label{pca}
+\end{figure}
+
+%\newpage
+
+\section{Break-Fix evolution} \label{sec:breakfix}
+
+Break-Fix evolution is a novel laboratory evolution technique we developed in this work to enrich for interacting mutations with non-additive impacts on brightness. Conceptually, we begin by mutagenizing the GFP coding sequence, and then use fluorescence activated cell sorting (FACS) to isolate non-functional sequences. We further mutagenize these non-functional sequences, and then select for gain-of-function sequences. These gain-of-function sequences can either contain reversions of previously breaking mutations, or they can new mutations that compensate for a breaking mutation. Break-Fix evolution thereby enables us to better traverse the ruggedness of fitness landscapes at least locally to a given reference starting sequence.
+
+In this work, we applied two cycles of Break-Fix evolution to sfGFP. Here one cycle corresponds to a break and a subsequent fix. After each mutagenesis, approximately 20,000 cells were sorted into non-functional (during break) or functional (during fix) categories during FACS. These 20,000 cells were allowed to grow into a confluent culture before their DNA was prepped and the GFP sequence further mutagenized. 
+
+
+\section{High-throughput brightness measurement of GFP variants}
+\label{sec:flow-seq}
+
+\begin{figure}[h]
+  \includegraphics[width=1\linewidth,page=6,trim={0cm 7cm 0cm 0}]{figures/2018-05-09-NIPS_2018_Figures.pdf}
+  \caption[Workflow for high-throughput quantification of (sequence, function) pairs of GFP variants by FACS + NGS (Flow-Seq)]{Workflow for high-throughput quantification of (sequence, function) pairs of GFP variants by FACS + NGS (Flow-Seq) \cite{Kosuri2013-vt}. 
+  Our method for quantifying GFP brightness is similar to that of \cite{Sarkisyan2016-cr} but uses the pGERC construct from \cite{Kosuri2013-vt}.
+  A library of GFP variants (encoded in plasmid DNA) is transformed into \textit{E. coli}, with each cell effectively receiving a single variant. The library size is quantified and bottlenecked to approximately 100,000 variants. Each variant is represented multiple times in the full bacteria culture.
+  Cells are subjected to fluorescence activated cell sorting (FACS), and each cell ends up in a bin corresponding to its fluorescence. Approximately 1-million cells are sorted, representing on average $\sim$10 cells per variant.
+  Next-generating sequencing (NGS) is used to read each the GFP sequences in each brightness bin. A given variant's true brightness is estimated according to its distribution across the bins, using its abundance-weighted average. Figure adapted with permission from \cite{Kosuri2013-vt}.}
+\end{figure}
+
+
+
+\section{DNA library design for Break-fix and 96 Designed Neighborhoods}
+\label{sec:libdesign}
+
+In generating the sfGFP Break-Fix library and 96 Designed Neighborhoods, we limited mutagenesis to a contiguous region encoding 163 of the 238 amino acid residues of the full GFP (residues 39 - 201), without loss of generality toward our primary goal of exploring how machine learning can enable protein design. This region spanned 489 nucleotides that comfortably fit within the 600-bp constraint of the longest commercially-available short-read technology (MiSeq paired-end 300). The 111 base pair margin allowed overlap of the two read pairs, thereby compensating for the well-documented reduced quality of the second read. Sarkisyan \emph{et al.} employed a restriction enzyme + barcoding trick to obtain the full 714 nucleotide sequence \cite{Sarkisyan2016-cr}, which added complexity to the wet lab experiment. Our chosen region entirely covers the chromophore residues (65 - 67) and the most important residues previously reported in literature \cite{Dedecker2013-hv}. Additionally, this region covers several instances of each type of secondary structure feature (beta sheets, turns, etc.). Subsequent design of new variants was also limited to this 163-residue region.
+
+
+
+\section{Simulated annealing of a model approximated fitness landscape for sequence proposal} \label{sec:simanneal}
+
+We assume we have a model, $f(x| \hat{\theta} )$, that predicts the biological function of the protein encoded by sequence $x$. Here $\hat{\theta}$ is a set of estimated model parameters. We assume $f(x| \hat{\theta} )$ is an approximation to the true fitness landscape, and that we have a (symmetric) proposal distribution that randomly mutates $x$. 
+
+\subsection{Unrestricted sequence proposal}
+
+Unrestricted sequence proposal proceeds by proposing a small number (1-3) of random mutations to $x$  to produce $x^*$. This proposed sequence is accepted according to a temperature adjusted Hastings ratio,
+\[
+\min\left[1, \left( \frac{f(x^*|\hat{\theta})}{f(x|\hat{\theta})}\right)^{(1/T)}   \right]
+\]
+
+If accepted, $x \leftarrow x^*$, else, $x \leftarrow x$. This procedure is repeated iteratively for a fixed number of iterations or until predicted brightness no longer improves. Here, $T$ is the temperature parameter that is exponentially decayed throughout the course of annealing. 
+
+\subsection{Restricted sequence proposal - sampling non-trivial mutants}
+
+Restricted sequence proposal proceeds similarly to unrestricted sampling. However the acceptance probability is updated as follows, 
+
+\[
+\min\left[1, \left( \frac{f(x^*|\hat{\theta})c(x^*) }{f(x|\hat{\theta})c(x)}\right)^{(1/T)}   \right]
+\]
+
+Here $c(\cdot)$ is a constraint function that positively scores a sequence if is more in line with a given constraint. For example, for biasing sampling toward non-trivial mutations we let $c(x)$ be positively related to the average entropy ratio (dark-to-bright) of all mutations contained within $x$. A non-trivial mutation will have larger entropy among dark mutants than among bright mutants, and so, if $x$ contains many non-trivial mutations $c(x)$ will be relatively large. 
+
+More specifically, for sampling of non-trivial mutants, we calculate $c(x)$ using the following procedure:
+
+\begin{enumerate}
+\item Let $r(i) = \mathtt{entropy\_ratio\_dark\_to\_bright}(i)^{10}$. In words, $r(i)$ is the estimated entropy ratio (dark-to-bright) of amino acid $i$ raised to the $10^{th}$ power.
+\item $s(i) = 1/(1 + \exp[ r(i) - \bar{r} ])$, where $\bar{r} = (1/L) \sum_{i=1}^{L} r(i)$. $s$ is thus a ``sigmoid-ized'' version of $r(i)$. We refer to $s(i)$ as the non-triviality score of position $i$. Note that the scores are centered at 0.5. Thus the sigmoid aims to preserve as much of the dynamic range in the entropy ratios as possible, without letting any one position have a dominantly large or insignificantly small score. 
+\item $c(x) = (1/L)\sum_{i=1}^L s(i) \mathbb{I}[x_i \neq \mathtt{wt}_i] $, where $\mathtt{wt}_i$ denotes the wild-type amino acid at position $i$. In words, $c(x)$ is the average non-triviality score of all mutated positions in sequence $x$. 
+\end{enumerate}
+
+
+
+\section{Composite Residues model} \label{sec:compres}
+
+\subsection{Architecture}
+The Composite Residues model aims to capture the intuition that small groupings of amino acids (and perhaps further groupings thereof) underpin protein function. Structural co-location and cooperation might be the most intuitive association; however, this need not be the only form of grouping. Toward this end, we speculated that a network layer that learns to linearly combine numerically encoded amino acids into “composite residues” as a feature for downstream interpretation may best capture these intuitions.  Supplementary Figure \ref{compres} illustrates the model architecture.
+
+\begin{figure}[t!]
+  \includegraphics[width=1\linewidth,page=7,trim={5cm 9cm 6cm 0}]{figures/2018-05-09-NIPS_2018_Figures.pdf}
+  \caption[Composite Residues model architecture used in this study]{Composite Residues model architecture used in this study. Shapes with blue borders indicate learned parameters, and their dimensions are shown. Amino acid residues initially represented as one-hot encodings are character embedded. The character embedded sequence is sent through a Composite Residues layer, which linearly combines encoded amino acid residues to produce a $15 \times 5$ sequence of composite amino acid residues. After flattening this matrix, we apply a SELU non-linearity, and this is passed to 5-dimensional fully connected hidden layer. We finally apply another SELU non-linearity, and pass this to a fully connected one-dimensional output node. The output activation is either linear or sigmoid as described in the main text.}
+  \label{compres}
+\end{figure}
+
+\subsection{Biophysical interpretation}
+
+The pooling matrix in the Composite Residues layer (Supplementary Figure \ref{compres}) is interpretable as each column in the matrix specifies a specific grouping of amino acid residues. We overlaid the most common amino acid groupings observed across the five replicate training runs of the Composite Residues model (main text) onto the structure of GFP (Supplementary Figure \ref{compres-interpret}). This revealed that the most common groupings involve five amino acids that are all inner barrel facing and help coordinate the chromophore. All of these residues are known to be individually important for coordinating the chromophore, and two of them, Arg 96 and Gln 183, are known to directly interact biophysically; the mutation of one can compensate for the mutation of the other \cite{wood2005defining}. 
+
+\begin{figure}[t!]
+  \includegraphics[width=1\linewidth,page=8,trim={1cm 3cm 1cm 0}]{figures/2018-05-09-NIPS_2018_Figures.pdf}
+  \caption[Illustration of the biophysical interpretability of the Composite Residues model]{Illustration of the biophysical interpretability of the Composite Residues model. Shown are three different view of the the five residues most often grouped together across replicate training runs of the Composite Residues model. The green atoms belong to the chromophore residues.}
+  \label{compres-interpret}
+\end{figure}
+
+\section{Train-dev-test split analysis and model selection}
+\label{sec:tts}
+
+All models were trained using TensorFlow \cite{abadi2016tensorflow}. The train-dev-test split analysis illustrated in Figure \ref{main-fig-tts} was performed by training all models between 3000 and 20,000 epochs, or until convergence. Five replicates were trained for each model architecture and train-dev-test split combination. For a given replicate, model weights for evaluating performance on test data were chosen according to the lowest epoch number for which a statistically lower mean squared error (MSE) on the dev dataset was not observed at a later epoch.
+
+\section{Directed evolution} \label{sec:devol}
+
+As a wet lab control for machine-guided protein design, we performed two rounds of directed evolution. The starting substrate was either 1) sfGFP or 2) functional parents of the 96 Designed Neighborhoods, and we performed two replicates of each. To each (pooled) substrate we introduced genetic diversity by performing error-prone PCR (epPCR) followed by DNA shuffling \cite{arnold2003directed}. epPCR samples the neighborhood of all templates in the pool and DNA-shuffling recombines templates in a manner analogous to meiotic crossover. Diversified template libraries were then cloned into \emph{E. coli} and subjected to fluorescence activated cell sorting (FACS), where only the brightest 0.1-0.5\% of cells were collected. FACS gates were set up to include only cells within one standard deviation in RFP and $\approx$ 1,000-20,000 cells were collected depending on time-feasibility of the sort. GFP DNA templates were purified from these selected cells and the diversification and selection process was repeated once more to complete the second cycle. Finally, we manually picked 96 bright-looking colonies (clonal bacterial populations) and propagated these for quantitative analysis. 
+
+\section{Quantified brightness of all gain-of-function mutants}
+
+We quantified the brightness of all gain-of-function mutants, including those returned by directed evolution and those obtained through machine guided design (Supplementary Figure \ref{gofbright}). We note that the relative abundance of GoF variants returned by directed evolution was \textbf{not} a reflection of its hit-rate (how often a bright variant is found for every variant screened), but rather our own ascertainment bias in terms of how many colonies we picked.
+
+Supplementary Figure \ref{gofbright} shows that with the exception of two mutants, machine-guided designs produced variants with brightness statistically on par with those of directed evolution.
+
+\begin{figure}[h]
+  \includegraphics[width=1\linewidth,page=9,trim={1cm 7cm 0cm 0}]{figures/2018-05-09-NIPS_2018_Figures.pdf}
+  \caption[Estimated brightness of all gain-of-function mutants]{Estimated brightness of all gain-of-function mutants. Error bars illustrate standard deviation of the brightness of a clonal population of approximately 20,000 cells. The provenance of a particular mutant is indicated by the black indicator bars below the plot. Normalized brightness is on a $\log_{10}$ scale with sfGFP brightness set at 1.00.}
+  \label{gofbright}
+\end{figure}
+
+
+\section{Predicted background-averaged impact on brightness} \label{sec:bgavg}
+
+For a given sfGFP variant sequence, we define each mutation's predicted background-averaged impact on brightness as its average predicted effect when added to all possible subsets of background mutations that separate a reference sequence (in this case sfGFP) and the complete variant sequence (minus the mutation of interest). That is, for a given mutation in an sfGFP variant with $n$ mutations, we use a trained model (e.g. CR-sigmoid) to calculate the average predicted change in brightness of adding the mutation to all $2^{n-1}$ backgrounds without that variant.
+
+For example, consider a variant with three mutations: G67A (mutation of Glycine to Alanine at position 67), L141I, and H169L. The predicted background-averaged impact of L141I would be calculated as follows:
+
+
+\begin{center}
+  \begin{tabular}{ | l | l | l | l | }
+    \hline
+    Background mutation(s) & Pred. brightness of b.g. & Pred. brightness of b.g. + L141I & Delta \\ \hline
+    None & 1.0 & 1.05 & 0.05 \\ \hline
+    G67A & 0.0 & 0.05 & 0.05 \\ \hline
+    H169L & 0.9 & 1.2 & 0.3 \\ \hline
+    G67A, H169L & 0.0 & 0.1 & 0.1 \\ \hline
+    \multicolumn{3}{| r | }{L141I Pred. background averaged impact on brightness (average of Delta) } & 0.125 \\
+    \hline
+  \end{tabular}
+\end{center}
+
+In the above example, all possible background mutations can be easily enumerated. However, for variants with greater than 10 mutations, we do not enumerate all possible backgrounds, and instead rely on the following approximation: We randomly sample 1000 intermediate backgrounds and average a given mutation's impact relative to these backgrounds.
 
 \section{Acknowledgements}
 
